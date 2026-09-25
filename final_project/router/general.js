@@ -11,6 +11,19 @@ const getBooks = () => {
     });
 }
 
+const getBookByISBN = (isbn) => {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            const book = books[isbn];
+            if (book) {
+                resolve(book);
+            } else {
+                reject({ code: 404, message: `Unable to find book ${isbn}`});
+            }
+        }, 2000);
+    });
+}
+
 public_users.post("/register", (req,res) => {
   const { username, password } = req.body;
 
@@ -33,14 +46,14 @@ public_users.get('/',async function (req, res) {
 });
 
 // Get book details based on ISBN
-public_users.get('/isbn/:isbn',function (req, res) {
+public_users.get('/isbn/:isbn', async function (req, res) {
   const { isbn } = req.params;
-  const book = books[isbn];
-  if (!book) {
-    return res.status(404).send(`No book found for ISBN ${isbn}`);
+  try {
+    const book = await getBookByISBN(isbn);
+    return res.status(200).send(JSON.stringify(book, null, 2));
+  } catch (error) {
+    return res.status(error.code).send(error.message);
   }
-
-  return res.status(200).send(JSON.stringify(book, null, 2));
  });
   
 // Get book details based on author
