@@ -24,6 +24,21 @@ const getBookByISBN = (isbn) => {
     });
 }
 
+const getBooksByAuthor = (author) => {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            const data = [];
+            const bookArray = Object.entries(books);
+            for (const [_, book] of bookArray) {
+              if (book.author.toLocaleLowerCase() === author.toLocaleLowerCase()) {
+                  data.push(book);
+              }
+            }
+            resolve(data);            
+        }, 2000);
+    });
+}
+
 public_users.post("/register", (req,res) => {
   const { username, password } = req.body;
 
@@ -57,15 +72,9 @@ public_users.get('/isbn/:isbn', async function (req, res) {
  });
   
 // Get book details based on author
-public_users.get('/author/:author',function (req, res) {
+public_users.get('/author/:author', async function (req, res) {
   const { author } = req.params;
-  const data = [];
-  const bookArray = Object.entries(books);
-  for (const [_, book] of bookArray) {
-    if (book.author.toLocaleLowerCase() === author.toLocaleLowerCase()) {
-        data.push(book);
-    }
-  }
+  const data = await getBooksByAuthor(author);
   
   return res.status(200).send(JSON.stringify(data, null, 2));
 });
