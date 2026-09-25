@@ -54,6 +54,19 @@ regd_users.put("/auth/review/:isbn", (req, res) => {
   return res.status(200).send(`Review for isbn ${isbn} successfully added`);
 });
 
+regd_users.delete("/auth/review/:isbn", (req, res) => {
+    const { isbn } = req.params;
+    const book = books[isbn];
+    const { username } = req.session.authorization;
+
+    if (!book) {
+        res.status(404).send('Book not found!');
+    }
+
+    delete book.reviews[username];
+    return res.status(200).send(`Review from isbn ${isbn} from ${username} deleted`)
+});
+
 module.exports.authenticated = regd_users;
 module.exports.isValid = isValid;
 module.exports.users = users;
