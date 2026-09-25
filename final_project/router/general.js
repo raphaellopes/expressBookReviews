@@ -39,6 +39,20 @@ const getBooksByAuthor = (author) => {
     });
 }
 
+const getBooksByTitle = (title) => {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            const data = [];
+            for (const [_, book] of Object.entries(books)) {
+              if (book.title.toLocaleLowerCase() === title.toLocaleLowerCase()) {
+                  data.push(book);
+              }
+            }
+            resolve(data);            
+        }, 2000);
+    });
+}
+
 public_users.post("/register", (req,res) => {
   const { username, password } = req.body;
 
@@ -80,14 +94,10 @@ public_users.get('/author/:author', async function (req, res) {
 });
 
 // Get all books based on title
-public_users.get('/title/:title',function (req, res) {
+public_users.get('/title/:title', async function (req, res) {
   const { title } = req.params;
-  const data = [];
-  for (const [_, book] of Object.entries(books)) {
-    if (book.title.toLocaleLowerCase() === title.toLocaleLowerCase()) {
-        data.push(book);
-    }
-  }
+  const data = await getBooksByTitle(title);
+  
   return res.status(200).send(JSON.stringify(data, null, 2));
 });
 
