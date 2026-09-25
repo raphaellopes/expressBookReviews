@@ -19,8 +19,22 @@ const authenticatedUser = (username, password)=>{ //returns boolean
 
 //only registered users can login
 regd_users.post("/login", (req,res) => {
-  //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
+  const { username, password } = req.body;
+  if (!username || !password) {
+    return res.status(401).send("Error logging in!");
+  }
+
+  if (authenticatedUser(username, password)) {
+    const accessToken = jwt.sign(
+        { data: password },
+        'secret-api-key',
+        { expiresIn: 60 * 60 }
+    );
+    req.session.authorization = { accessToken, username };
+    return res.status(200).send('User sucessfully logged in!');
+  } else {
+    return res.status(208).json('Invalid Login. Check username and password');
+  }
 });
 
 // Add a book review
